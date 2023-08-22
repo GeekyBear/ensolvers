@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
@@ -13,8 +22,8 @@ export class NotesController {
   }
 
   @Get()
-  findAll() {
-    return this.notesService.findAll();
+  findAll(@Query('isArchived') isArchived: boolean) {
+    return this.notesService.findAll(isArchived);
   }
 
   @Get(':id')

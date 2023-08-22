@@ -16,8 +16,12 @@ export class NotesService {
     return this.notesRepository.save(createNoteDto);
   }
 
-  findAll(): Promise<Note[]> {
-    return this.notesRepository.find();
+  findAll(isArchived: boolean): Promise<Note[]> {
+    return this.notesRepository.find({
+      where: {
+        archived: isArchived,
+      },
+    });
   }
 
   findOne(id: number) {

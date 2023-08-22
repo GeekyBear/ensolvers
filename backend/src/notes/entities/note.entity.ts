@@ -13,7 +13,7 @@ export class Note {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   content: string;
 
   @Column({ type: 'boolean', default: false })
