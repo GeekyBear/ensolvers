@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import Note from "../components/Note";
 import axios from "axios";
 import EditNote from "../components/EditNote/EditNote";
+import authHeader from "../services/authHeader";
 
 export default function Archived() {
   const [notes, setNotes] = useState([]);
   const [editingNote, setEditingNote] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [reflectChanges, setReflectChanges] = useState(false);
 
   useEffect(() => {
     axios
@@ -15,6 +17,7 @@ export default function Archived() {
         params: {
           isArchived: true,
         },
+        headers: authHeader(),
       })
       .then(function (response) {
         setNotes(response.data);
@@ -22,7 +25,7 @@ export default function Archived() {
       .catch(function (error) {
         console.log(error);
       });
-  }, [notes]);
+  }, [reflectChanges]);
 
   return (
     <>
@@ -50,6 +53,8 @@ export default function Archived() {
               setEditingNote={setEditingNote}
               setEditingId={setEditingId}
               note={note}
+              reflectChanges={reflectChanges}
+              setReflectChanges={setReflectChanges}
             />
           ))
         ) : (

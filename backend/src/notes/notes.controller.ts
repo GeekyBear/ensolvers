@@ -11,6 +11,7 @@ import {
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
+import { Public } from 'src/public.decorator';
 
 @Controller('notes')
 export class NotesController {

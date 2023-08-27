@@ -10,4 +10,6 @@ export class CreateNoteDto {
   @IsOptional()
   @IsBoolean()
   archived: boolean;
+
+  categoriesIds: [];
 }

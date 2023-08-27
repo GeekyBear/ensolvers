@@ -1,5 +1,9 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import styles from "./CreateNote.module.css";
+import CategoriesContainer from "../CategoriesContainer/CategoriesContainer";
+import AddCategory from "../AddCategory/AddCategory";
+import authHeader from "../../services/authHeader";
 
 const initialNote = {
   title: "",
@@ -9,6 +13,10 @@ const initialNote = {
 
 export default function CreateNote({ setCreatingNote }) {
   const [note, setNote] = useState(initialNote);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState("");
+  const [addedCategory, setAddedCategory] = useState(false);
 
   function handleChange(e) {
     setNote({
@@ -18,9 +26,65 @@ export default function CreateNote({ setCreatingNote }) {
     });
   }
 
+  function handleNewCategory(e) {
+    setNewCategory(e.target.value);
+  }
+
+  function handleCategory(myId) {
+    if (selectedCategories.find((id) => id === myId)) {
+      setSelectedCategories(selectedCategories.filter((id) => id !== myId));
+    } else {
+      setSelectedCategories((selectedCategories) => [
+        ...selectedCategories,
+        myId,
+      ]);
+    }
+  }
+
+  function createNewCategory() {
+    if (newCategory === "" || newCategory === undefined) return;
+
+    axios
+      .post(
+        "http://localhost:3000/categories/",
+        {
+          name: newCategory,
+        },
+        { headers: authHeader() }
+      )
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .finally(() => {
+        setAddedCategory(!addedCategory);
+        setNewCategory("");
+      });
+  }
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/categories", { headers: authHeader() })
+      .then(function (response) {
+        setCategories(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, [addedCategory]);
+
   function handleSubmit() {
     axios
-      .post("http://localhost:3000/notes/", note)
+      .post(
+        "http://localhost:3000/notes/",
+        {
+          ...note,
+          categoriesIds: selectedCategories,
+        },
+        { headers: authHeader() }
+      )
       .then(function (response) {
         console.log(response);
       })
@@ -29,6 +93,7 @@ export default function CreateNote({ setCreatingNote }) {
       });
     setCreatingNote(false);
   }
+
   return (
     <div
       style={{
@@ -36,6 +101,7 @@ export default function CreateNote({ setCreatingNote }) {
         display: "flex",
         flexDirection: "column",
         backgroundColor: "white",
+        maxWidth: "360px",
         padding: 20,
         gap: 12,
         top: "30%",
@@ -60,7 +126,17 @@ export default function CreateNote({ setCreatingNote }) {
           onChange={(e) => handleChange(e)}
         />
       </label>
-      <div>
+      <CategoriesContainer
+        categories={categories}
+        selectedCategories={selectedCategories}
+        handleCategory={handleCategory}
+      />
+      <AddCategory
+        newCategory={newCategory}
+        handleNewCategory={handleNewCategory}
+        createNewCategory={createNewCategory}
+      />
+      <div className={styles.buttonsContainer}>
         <button onClick={() => setCreatingNote(false)}>Cancel</button>
         <button onClick={() => handleSubmit()}>Save note</button>
       </div>

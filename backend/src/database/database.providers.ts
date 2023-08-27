@@ -1,4 +1,5 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Category } from 'src/categories/entities/category.entity';
 import { Note } from 'src/notes/entities/note.entity';
 
 export const DatabaseProvider = [
@@ -10,7 +11,7 @@ export const DatabaseProvider = [
     password: 'postgres',
     port: 5436,
     synchronize: true,
-    entities: [Note],
+    entities: [Note, Category],
     migrations: [__dirname + '../migrations/*{.ts,.js}'],
   }),
 ];

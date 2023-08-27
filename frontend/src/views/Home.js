@@ -4,12 +4,31 @@ import Note from "../components/Note";
 import axios from "axios";
 import CreateNote from "../components/CreateNote/CreateNote";
 import EditNote from "../components/EditNote/EditNote";
+import authHeader from "../services/authHeader";
 
 export default function Home({ isArchived }) {
   const [notes, setNotes] = useState([]);
+  const [filteredNotes, setFilteredNotes] = useState([]);
   const [creatingNote, setCreatingNote] = useState(false);
   const [editingNote, setEditingNote] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [filterName, setFilterName] = useState("default");
+  const [reflectChanges, setReflectChanges] = useState(false);
+
+  function filterNotes() {
+    if (filterName !== "default") {
+      console.log("filterName", filterName);
+      setFilteredNotes(
+        notes.filter((note) =>
+          note.categories.find((cat) => cat.name === filterName)
+        )
+      );
+    } else {
+      console.log("else");
+      setFilteredNotes([]);
+    }
+  }
 
   useEffect(() => {
     axios
@@ -17,6 +36,7 @@ export default function Home({ isArchived }) {
         params: {
           isArchived: false,
         },
+        headers: authHeader(),
       })
       .then(function (response) {
         setNotes(response.data);
@@ -24,7 +44,54 @@ export default function Home({ isArchived }) {
       .catch(function (error) {
         console.log(error);
       });
-  }, [notes, isArchived]);
+  }, [isArchived, reflectChanges]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/categories", {
+        headers: authHeader(),
+      })
+      .then(function (response) {
+        console.log(response.data);
+        setCategories(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
+
+  async function handleSelect(e) {
+    console.log("handle Select");
+    setFilterName(e.target.value);
+    filterNotes();
+  }
+
+  const ConditionalRendering = () => {
+    if (filterName !== "default") {
+      console.log("filterName conditional rendering", filterName);
+      return filteredNotes.map((note) => (
+        <Note
+          key={note.id}
+          setEditingNote={setEditingNote}
+          setEditingId={setEditingId}
+          note={note}
+          reflectChanges={reflectChanges}
+          setReflectChanges={setReflectChanges}
+        />
+      ));
+    } else {
+      return notes.map((note) => (
+        <Note
+          key={note.id}
+          setEditingNote={setEditingNote}
+          setEditingId={setEditingId}
+          note={note}
+          reflectChanges={reflectChanges}
+          setReflectChanges={setReflectChanges}
+        />
+      ));
+    }
+  };
 
   return (
     <>
@@ -61,19 +128,25 @@ export default function Home({ isArchived }) {
       {editingNote && (
         <EditNote setEditingNote={setEditingNote} editingId={editingId} />
       )}
+
+      <div style={{ display: "flex", color: "wheat", gap: 12 }}>
+        <p>Filter by category</p>
+        <select
+          style={{ margin: "8px 0px" }}
+          name="select"
+          onChange={(e) => handleSelect(e)}
+        >
+          <option value="default">Default</option>
+          {categories &&
+            categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+        </select>
+      </div>
       <section className="grid-1">
-        {notes ? (
-          notes.map((note) => (
-            <Note
-              key={note.id}
-              setEditingNote={setEditingNote}
-              setEditingId={setEditingId}
-              note={note}
-            />
-          ))
-        ) : (
-          <p>Cargando</p>
-        )}
+        <ConditionalRendering />
       </section>
     </>
   );
