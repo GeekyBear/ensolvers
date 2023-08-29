@@ -9,6 +9,7 @@ import {
 import axios from "axios";
 import DeleteNote from "./DeleteNote/DeleteNote";
 import authHeader from "../services/authHeader";
+import { API_URL } from "../constants/constants";
 
 export default function Note({
   note,
@@ -17,12 +18,12 @@ export default function Note({
   reflectChanges,
   setReflectChanges,
 }) {
-  const { id, title, content, archived } = note;
+  const { id, title, content, archived, categories } = note;
   const [deletingNote, setDeletingNote] = useState(false);
 
-  const handleDelete = () => {
-    axios
-      .delete(`http://localhost:3000/notes/${id}`)
+  const handleDelete = async () => {
+    await axios
+      .delete(API_URL + `notes/${id}`, { headers: authHeader() })
       .then((response) => {
         console.log(`Deleted post with ID ${id}`);
       })
@@ -32,10 +33,10 @@ export default function Note({
     setReflectChanges(!reflectChanges);
   };
 
-  const handleArchive = () => {
-    axios
+  const handleArchive = async () => {
+    await axios
       .patch(
-        `http://localhost:3000/notes/${id}`,
+        API_URL + `notes/${id}`,
         { archived: !archived },
         { headers: authHeader() }
       )
@@ -58,6 +59,28 @@ export default function Note({
     <div key={id} className={styles.item}>
       <h3>{title}</h3>
       <p>{content}</p>
+      <div
+        style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 8 }}
+      >
+        {categories &&
+          categories.map((category) => (
+            <button
+              key={category.id}
+              style={{
+                textDecoration: "none",
+                color: "gray",
+                backgroundColor: "#f7e6c4",
+                padding: "4px 8px",
+                borderRadius: 15,
+                fontSize: "small",
+                boxShadow: "2px 2px 4px 0px rgba(0,0,0,0.35)",
+              }}
+              to="/archived"
+            >
+              {category.name}
+            </button>
+          ))}
+      </div>
       <div className={styles.buttons}>
         <button onClick={() => handleArchive()}>
           {archived ? (

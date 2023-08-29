@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 async function LoginUser(credentials) {
-  return fetch("http://localhost:3000/auth/login", {
+  return fetch(API_URL + "auth/login", {
     method: "POST",
     header: {
       "Content-Type": "application/json",

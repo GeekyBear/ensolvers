@@ -4,6 +4,7 @@ import styles from "./EditNote.module.css";
 import CategoriesContainer from "../CategoriesContainer/CategoriesContainer";
 import AddCategory from "../AddCategory/AddCategory";
 import authHeader from "../../services/authHeader";
+import { API_URL } from "../../constants/constants";
 
 const initialNote = {
   title: "",
@@ -11,7 +12,12 @@ const initialNote = {
   archived: false,
 };
 
-export default function EditNote({ setEditingNote, editingId }) {
+export default function EditNote({
+  setEditingNote,
+  editingId,
+  reflectChanges,
+  setReflectChanges,
+}) {
   const [note, setNote] = useState(initialNote);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -20,7 +26,7 @@ export default function EditNote({ setEditingNote, editingId }) {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:3000/notes/${editingId}`, {
+      .get(API_URL + `notes/${editingId}`, {
         headers: authHeader(),
       })
       .then(function (response) {
@@ -32,11 +38,11 @@ export default function EditNote({ setEditingNote, editingId }) {
       .catch(function (error) {
         console.log(error);
       });
-  }, []);
+  }, [editingId]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/categories", { headers: authHeader() })
+      .get(API_URL + "categories", { headers: authHeader() })
       .then(function (response) {
         setCategories(response.data);
       })
@@ -73,7 +79,7 @@ export default function EditNote({ setEditingNote, editingId }) {
 
     axios
       .post(
-        "http://localhost:3000/categories/",
+        API_URL + "categories/",
         {
           name: newCategory,
         },
@@ -91,10 +97,10 @@ export default function EditNote({ setEditingNote, editingId }) {
       });
   }
 
-  function handleSubmit() {
-    axios
+  async function handleSubmit() {
+    await axios
       .patch(
-        `http://localhost:3000/notes/${note.id}`,
+        API_URL + `notes/${note.id}`,
         {
           ...note,
           categoriesIds: selectedCategories,
@@ -108,6 +114,7 @@ export default function EditNote({ setEditingNote, editingId }) {
         console.log(error);
       });
     setEditingNote(false);
+    setReflectChanges(!reflectChanges);
   }
 
   return (

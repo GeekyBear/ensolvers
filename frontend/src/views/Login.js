@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/auth.service";
 
-export default function Login() {
+export default function Login({ setToken }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ export default function Login() {
     try {
       await authService.login(username, password).then(
         () => {
+          setToken(authService.getCurrentUser());
           navigate("/");
         },
         (error) => {
@@ -34,24 +35,38 @@ export default function Login() {
 
   return (
     <div
-      style={{ color: "wheat", display: "flex", gap: 16, alignItems: "center" }}
+      style={{
+        position: "absolute",
+        marginLeft: "auto",
+        marginRight: "auto",
+        left: 0,
+        right: 0,
+        gap: 16,
+        textAlign: "center",
+        display: "flex",
+        flexDirection: " column",
+        alignItems: "flex-start",
+        padding: 24,
+        width: 400,
+        height: 300,
+        backgroundColor: "white",
+      }}
     >
-      <label>
-        user:{" "}
-        <input
-          name="username"
-          value={username}
-          onChange={(e) => handleChangeUser(e)}
-        />
-      </label>
-      <label>
-        password:{" "}
-        <input
-          name="password"
-          value={password}
-          onChange={(e) => handleChangePassword(e)}
-        />
-      </label>
+      <h1 style={{ color: "black", alignSelf: "center" }}>Login</h1>
+      <label>User:</label>
+      <input
+        name="username"
+        value={username}
+        placeholder="test"
+        onChange={(e) => handleChangeUser(e)}
+      />
+      <label>Password:</label>
+      <input
+        name="password"
+        value={password}
+        placeholder="1234"
+        onChange={(e) => handleChangePassword(e)}
+      />
       <button
         style={{
           padding: 8,

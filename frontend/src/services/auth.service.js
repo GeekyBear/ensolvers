@@ -1,10 +1,9 @@
 import axios from "axios";
-
-const API_URL = "http://localhost:3000/auth";
+import { AUTH_URL } from "../constants/constants";
 
 const signUp = async (username, password) => {
   return await axios
-    .post(API_URL + "/signup", {
+    .post(AUTH_URL + "/signup", {
       username,
       password,
     })
@@ -18,7 +17,7 @@ const signUp = async (username, password) => {
 
 const login = (username, password) => {
   return axios
-    .post(API_URL + "/login", {
+    .post(AUTH_URL + "/login", {
       username,
       password,
     })

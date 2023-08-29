@@ -4,6 +4,7 @@ import styles from "./CreateNote.module.css";
 import CategoriesContainer from "../CategoriesContainer/CategoriesContainer";
 import AddCategory from "../AddCategory/AddCategory";
 import authHeader from "../../services/authHeader";
+import { API_URL } from "../../constants/constants";
 
 const initialNote = {
   title: "",
@@ -11,7 +12,11 @@ const initialNote = {
   archived: false,
 };
 
-export default function CreateNote({ setCreatingNote }) {
+export default function CreateNote({
+  setCreatingNote,
+  reflectChanges,
+  setReflectChanges,
+}) {
   const [note, setNote] = useState(initialNote);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -41,12 +46,12 @@ export default function CreateNote({ setCreatingNote }) {
     }
   }
 
-  function createNewCategory() {
+  async function createNewCategory() {
     if (newCategory === "" || newCategory === undefined) return;
 
-    axios
+    await axios
       .post(
-        "http://localhost:3000/categories/",
+        API_URL + "categories/",
         {
           name: newCategory,
         },
@@ -66,7 +71,7 @@ export default function CreateNote({ setCreatingNote }) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/categories", { headers: authHeader() })
+      .get(API_URL + "categories", { headers: authHeader() })
       .then(function (response) {
         setCategories(response.data);
       })
@@ -75,10 +80,10 @@ export default function CreateNote({ setCreatingNote }) {
       });
   }, [addedCategory]);
 
-  function handleSubmit() {
-    axios
+  async function handleSubmit() {
+    await axios
       .post(
-        "http://localhost:3000/notes/",
+        API_URL + "notes/",
         {
           ...note,
           categoriesIds: selectedCategories,
@@ -92,6 +97,7 @@ export default function CreateNote({ setCreatingNote }) {
         console.log(error);
       });
     setCreatingNote(false);
+    setReflectChanges(!reflectChanges);
   }
 
   return (

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Note from "../components/Note";
 import axios from "axios";
 import CreateNote from "../components/CreateNote/CreateNote";
 import EditNote from "../components/EditNote/EditNote";
 import authHeader from "../services/authHeader";
+import { API_URL } from "../constants/constants";
 
 export default function Home({ isArchived }) {
   const [notes, setNotes] = useState([]);
-  const [filteredNotes, setFilteredNotes] = useState([]);
   const [creatingNote, setCreatingNote] = useState(false);
   const [editingNote, setEditingNote] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -16,43 +16,36 @@ export default function Home({ isArchived }) {
   const [filterName, setFilterName] = useState("default");
   const [reflectChanges, setReflectChanges] = useState(false);
 
-  function filterNotes() {
-    if (filterName !== "default") {
-      console.log("filterName", filterName);
-      setFilteredNotes(
-        notes.filter((note) =>
-          note.categories.find((cat) => cat.name === filterName)
-        )
-      );
-    } else {
-      console.log("else");
-      setFilteredNotes([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!authHeader()) return navigate("/login");
+
+    async function fetchData() {
+      await axios
+        .get(API_URL + "notes", {
+          params: {
+            isArchived: false,
+            filterName,
+          },
+          headers: authHeader(),
+        })
+        .then(function (response) {
+          setNotes(response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
-  }
+    fetchData();
+  }, [isArchived, reflectChanges, filterName, navigate]);
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/notes", {
-        params: {
-          isArchived: false,
-        },
+      .get(API_URL + "categories", {
         headers: authHeader(),
       })
       .then(function (response) {
-        setNotes(response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [isArchived, reflectChanges]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/categories", {
-        headers: authHeader(),
-      })
-      .then(function (response) {
-        console.log(response.data);
         setCategories(response.data);
       })
       .catch(function (error) {
@@ -61,50 +54,27 @@ export default function Home({ isArchived }) {
   }, []);
 
   async function handleSelect(e) {
-    console.log("handle Select");
     setFilterName(e.target.value);
-    filterNotes();
   }
-
-  const ConditionalRendering = () => {
-    if (filterName !== "default") {
-      console.log("filterName conditional rendering", filterName);
-      return filteredNotes.map((note) => (
-        <Note
-          key={note.id}
-          setEditingNote={setEditingNote}
-          setEditingId={setEditingId}
-          note={note}
-          reflectChanges={reflectChanges}
-          setReflectChanges={setReflectChanges}
-        />
-      ));
-    } else {
-      return notes.map((note) => (
-        <Note
-          key={note.id}
-          setEditingNote={setEditingNote}
-          setEditingId={setEditingId}
-          note={note}
-          reflectChanges={reflectChanges}
-          setReflectChanges={setReflectChanges}
-        />
-      ));
-    }
-  };
 
   return (
     <>
-      <div style={{ display: "flex", gap: 12, position: "relative" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: 24,
+          position: "relative",
+          alignItems: "center",
+        }}
+      >
         <h1>My notes</h1>
         <button
           style={{
-            margin: 20,
-            marginBottom: 40,
+            marginLeft: 24,
             textDecoration: "none",
             color: "black",
             backgroundColor: "white",
-            padding: 20,
+            padding: 12,
           }}
           onClick={() => setCreatingNote(true)}
         >
@@ -112,21 +82,28 @@ export default function Home({ isArchived }) {
         </button>
         <Link
           style={{
-            margin: 20,
-            marginBottom: 40,
             textDecoration: "none",
-            color: "black",
-            backgroundColor: "white",
-            padding: 20,
+            color: "wheat",
           }}
           to="/archived"
         >
-          Archived
+          Go to archived notes
         </Link>
       </div>
-      {creatingNote && <CreateNote setCreatingNote={setCreatingNote} />}
+      {creatingNote && (
+        <CreateNote
+          setCreatingNote={setCreatingNote}
+          reflectChanges={reflectChanges}
+          setReflectChanges={setReflectChanges}
+        />
+      )}
       {editingNote && (
-        <EditNote setEditingNote={setEditingNote} editingId={editingId} />
+        <EditNote
+          setEditingNote={setEditingNote}
+          editingId={editingId}
+          reflectChanges={reflectChanges}
+          setReflectChanges={setReflectChanges}
+        />
       )}
 
       <div style={{ display: "flex", color: "wheat", gap: 12 }}>
@@ -146,7 +123,17 @@ export default function Home({ isArchived }) {
         </select>
       </div>
       <section className="grid-1">
-        <ConditionalRendering />
+        {notes &&
+          notes.map((note) => (
+            <Note
+              key={note.id}
+              setEditingNote={setEditingNote}
+              setEditingId={setEditingId}
+              note={note}
+              reflectChanges={reflectChanges}
+              setReflectChanges={setReflectChanges}
+            />
+          ))}
       </section>
     </>
   );

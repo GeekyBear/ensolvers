@@ -1,6 +1,4 @@
 .item {
-  display: flex;
-  flex-direction: column;
   background-color: wheat;
   padding: 20px;
 }

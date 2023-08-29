@@ -5,7 +5,6 @@ export default function authHeader() {
     return { Authorization: "Bearer " + user.access_token };
     // return { "x-auth-token": user.accessToken };
   } else {
-    console.log("return empty");
-    return {};
+    return null;
   }
 }
