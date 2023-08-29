@@ -4,6 +4,7 @@ import { Note } from 'src/notes/entities/note.entity';
 
 export const DatabaseProvider = [
   TypeOrmModule.forRoot({
+    type: 'postgres',
     host: process.env.POSTGRES_HOST,
     port: parseInt(process.env.POSTGRES_PORT),
     username: process.env.POSTGRES_USERNAME,
