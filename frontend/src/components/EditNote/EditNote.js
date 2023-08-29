@@ -1,5 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import styles from "./EditNote.module.css";
+import CategoriesContainer from "../CategoriesContainer/CategoriesContainer";
+import AddCategory from "../AddCategory/AddCategory";
+import authHeader from "../../services/authHeader";
+import { API_URL } from "../../constants/constants";
 
 const initialNote = {
   title: "",
@@ -7,19 +12,44 @@ const initialNote = {
   archived: false,
 };
 
-export default function EditNote({ setEditingNote, editingId }) {
+export default function EditNote({
+  setEditingNote,
+  editingId,
+  reflectChanges,
+  setReflectChanges,
+}) {
   const [note, setNote] = useState(initialNote);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState("");
+  const [addedCategory, setAddedCategory] = useState(false);
 
   useEffect(() => {
     axios
-      .get(`  http://localhost:3000/notes/${editingId}`)
+      .get(API_URL + `notes/${editingId}`, {
+        headers: authHeader(),
+      })
       .then(function (response) {
         setNote(response.data[0]);
+        setSelectedCategories(
+          response.data[0].categories?.map((cat) => cat.id)
+        );
       })
       .catch(function (error) {
         console.log(error);
       });
-  }, []);
+  }, [editingId]);
+
+  useEffect(() => {
+    axios
+      .get(API_URL + "categories", { headers: authHeader() })
+      .then(function (response) {
+        setCategories(response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, [addedCategory]);
 
   function handleChange(e) {
     setNote({
@@ -29,9 +59,54 @@ export default function EditNote({ setEditingNote, editingId }) {
     });
   }
 
-  function handleSubmit() {
+  function handleNewCategory(e) {
+    setNewCategory(e.target.value);
+  }
+
+  function handleCategory(myId) {
+    if (selectedCategories.find((id) => id === myId)) {
+      setSelectedCategories(selectedCategories.filter((id) => id !== myId));
+    } else {
+      setSelectedCategories((selectedCategories) => [
+        ...selectedCategories,
+        myId,
+      ]);
+    }
+  }
+
+  function createNewCategory() {
+    if (newCategory === "" || newCategory === undefined) return;
+
     axios
-      .post("http://localhost:3000/notes/", note)
+      .post(
+        API_URL + "categories/",
+        {
+          name: newCategory,
+        },
+        { headers: authHeader() }
+      )
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .finally(() => {
+        setAddedCategory(!addedCategory);
+        setNewCategory("");
+      });
+  }
+
+  async function handleSubmit() {
+    await axios
+      .patch(
+        API_URL + `notes/${note.id}`,
+        {
+          ...note,
+          categoriesIds: selectedCategories,
+        },
+        { headers: authHeader() }
+      )
       .then(function (response) {
         console.log(response);
       })
@@ -39,6 +114,7 @@ export default function EditNote({ setEditingNote, editingId }) {
         console.log(error);
       });
     setEditingNote(false);
+    setReflectChanges(!reflectChanges);
   }
 
   return (
@@ -59,7 +135,7 @@ export default function EditNote({ setEditingNote, editingId }) {
       <h3>Editing Note</h3>
 
       <label>
-        Titulo:{" "}
+        Titulo:
         <input
           name="title"
           value={note.title}
@@ -67,7 +143,7 @@ export default function EditNote({ setEditingNote, editingId }) {
         />
       </label>
       <label>
-        Contenido:{" "}
+        Contenido:
         <input
           name="content"
           value={note.content}
@@ -82,7 +158,17 @@ export default function EditNote({ setEditingNote, editingId }) {
           onChange={(e) => handleChange(e)}
         />
       </label>
-      <div>
+      <CategoriesContainer
+        categories={categories}
+        selectedCategories={selectedCategories}
+        handleCategory={handleCategory}
+      />
+      <AddCategory
+        newCategory={newCategory}
+        handleNewCategory={handleNewCategory}
+        createNewCategory={createNewCategory}
+      />
+      <div className={styles.buttonsContainer}>
         <button onClick={() => setEditingNote(false)}>Cancel</button>
         <button onClick={() => handleSubmit()}>Save note</button>
       </div>

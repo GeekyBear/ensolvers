@@ -1,5 +1,5 @@
 import React from "react";
-
+import styles from "./DeleteNote.module.css";
 export default function DeleteNote({ setDeletingNote, handleDelete }) {
   return (
     <div
@@ -17,7 +17,7 @@ export default function DeleteNote({ setDeletingNote, handleDelete }) {
       }}
     >
       <h3>Do you want to delete the note?</h3>
-      <div>
+      <div className={styles.buttonsContainer}>
         <button onClick={() => setDeletingNote(false)}>Cancel</button>
         <button onClick={() => handleDelete()}>Delete note</button>
       </div>
