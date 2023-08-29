@@ -23,8 +23,11 @@ export class NotesController {
   }
 
   @Get()
-  findAll(@Query('isArchived') isArchived: boolean) {
-    return this.notesService.findAll(isArchived);
+  findAll(
+    @Query('isArchived') isArchived: boolean,
+    @Query('filterName') filterName: string,
+  ) {
+    return this.notesService.findAll(isArchived, filterName);
   }
 
   @Get(':id')
