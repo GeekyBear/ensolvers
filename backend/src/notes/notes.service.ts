@@ -32,15 +32,29 @@ export class NotesService {
     return this.notesRepository.save(newNote);
   }
 
-  findAll(isArchived: boolean): Promise<Note[]> {
-    return this.notesRepository.find({
-      where: {
-        archived: isArchived,
-      },
-      relations: {
-        categories: true,
-      },
-    });
+  findAll(isArchived: boolean, filterName: string): Promise<Note[]> {
+    if (filterName === 'default') {
+      return this.notesRepository.find({
+        where: {
+          archived: isArchived,
+        },
+        relations: {
+          categories: true,
+        },
+      });
+    } else {
+      return this.notesRepository.find({
+        where: {
+          archived: isArchived,
+          categories: {
+            name: filterName,
+          },
+        },
+        relations: {
+          categories: true,
+        },
+      });
+    }
   }
 
   findOne(id: number) {

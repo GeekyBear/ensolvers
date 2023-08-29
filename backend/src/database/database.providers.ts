@@ -4,14 +4,20 @@ import { Note } from 'src/notes/entities/note.entity';
 
 export const DatabaseProvider = [
   TypeOrmModule.forRoot({
-    ssl: false,
-    type: 'postgres',
-    host: 'localhost',
-    username: 'postgres',
-    password: 'postgres',
-    port: 5436,
+    host: process.env.POSTGRES_HOST,
+    port: parseInt(process.env.POSTGRES_PORT),
+    username: process.env.POSTGRES_USERNAME,
+    password: process.env.POSTGRES_PASSWORD,
+    database: process.env.POSTGRES_DATABASE,
     synchronize: true,
     entities: [Note, Category],
     migrations: [__dirname + '../migrations/*{.ts,.js}'],
+    ssl: process.env.POSTGRES_SSL === 'true',
+    extra: {
+      ssl:
+        process.env.POSTGRES_SSL === 'true'
+          ? { rejectUnauthorized: false }
+          : null,
+    },
   }),
 ];
