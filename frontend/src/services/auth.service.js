@@ -3,7 +3,7 @@ import { AUTH_URL } from "../constants/constants";
 
 const signUp = async (username, password) => {
   return await axios
-    .post(AUTH_URL + "/signup", {
+    .post(AUTH_URL + "signup", {
       username,
       password,
     })
@@ -17,7 +17,7 @@ const signUp = async (username, password) => {
 
 const login = (username, password) => {
   return axios
-    .post(AUTH_URL + "/login", {
+    .post(AUTH_URL + "login", {
       username,
       password,
     })
