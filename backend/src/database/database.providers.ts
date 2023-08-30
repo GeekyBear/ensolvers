@@ -6,9 +6,9 @@ export const DatabaseProvider = [
   TypeOrmModule.forRoot({
     type: 'postgres',
     host: process.env.POSTGRES_HOST,
-    port: parseInt(process.env.POSTGRES_PORT),
     username: process.env.POSTGRES_USERNAME,
     password: process.env.POSTGRES_PASSWORD,
+    port: parseInt(process.env.POSTGRES_PORT),
     database: process.env.POSTGRES_DATABASE,
     synchronize: true,
     entities: [Note, Category],

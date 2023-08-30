@@ -5,6 +5,7 @@ import axios from "axios";
 import EditNote from "../components/EditNote/EditNote";
 import authHeader from "../services/authHeader";
 import { API_URL } from "../constants/constants";
+import styles from "../styles/Archived.module.css";
 
 export default function Archived() {
   const [notes, setNotes] = useState([]);
@@ -15,6 +16,7 @@ export default function Archived() {
 
   useEffect(() => {
     if (!authHeader()) return navigate("/login");
+    console.log("Archived notes useEffect");
     axios
       .get(API_URL + "notes", {
         params: {
@@ -32,14 +34,7 @@ export default function Archived() {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          position: "relative",
-          alignItems: "center",
-        }}
-      >
+      <div className={styles.container}>
         <h1>Archived notes</h1>
         <Link
           style={{

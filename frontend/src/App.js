@@ -10,6 +10,7 @@ function App() {
   const [token, setToken] = useState();
 
   useEffect(() => {
+    console.log("Set Token useEffect");
     setToken(authService.getCurrentUser());
   }, []);
 

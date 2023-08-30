@@ -6,6 +6,7 @@ import CreateNote from "../components/CreateNote/CreateNote";
 import EditNote from "../components/EditNote/EditNote";
 import authHeader from "../services/authHeader";
 import { API_URL } from "../constants/constants";
+import styles from "../styles/Home.module.css";
 
 export default function Home({ isArchived }) {
   const [notes, setNotes] = useState([]);
@@ -19,6 +20,8 @@ export default function Home({ isArchived }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Notes useEffect");
+
     if (!authHeader()) return navigate("/login");
 
     async function fetchData() {
@@ -41,6 +44,7 @@ export default function Home({ isArchived }) {
   }, [isArchived, reflectChanges, filterName, navigate]);
 
   useEffect(() => {
+    console.log("Categories useEffect");
     axios
       .get(API_URL + "categories", {
         headers: authHeader(),
@@ -51,7 +55,7 @@ export default function Home({ isArchived }) {
       .catch(function (error) {
         console.log(error);
       });
-  }, []);
+  }, [reflectChanges]);
 
   async function handleSelect(e) {
     setFilterName(e.target.value);
@@ -59,36 +63,20 @@ export default function Home({ isArchived }) {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          gap: 24,
-          position: "relative",
-          alignItems: "center",
-        }}
-      >
+      <div className={styles.container}>
         <h1>My notes</h1>
-        <button
-          style={{
-            marginLeft: 24,
-            textDecoration: "none",
-            color: "black",
-            backgroundColor: "white",
-            padding: 12,
-          }}
-          onClick={() => setCreatingNote(true)}
-        >
-          Create note
-        </button>
-        <Link
-          style={{
-            textDecoration: "none",
-            color: "wheat",
-          }}
-          to="/archived"
-        >
-          Go to archived notes
-        </Link>
+
+        <div className={styles.buttonContainer}>
+          <button
+            className={styles.createButton}
+            onClick={() => setCreatingNote(true)}
+          >
+            Create note
+          </button>
+          <Link className={styles.archiveButton} to="/archived">
+            Go to archived notes
+          </Link>
+        </div>
       </div>
       {creatingNote && (
         <CreateNote
@@ -106,10 +94,10 @@ export default function Home({ isArchived }) {
         />
       )}
 
-      <div style={{ display: "flex", color: "wheat", gap: 12 }}>
+      <div className={styles.categoryContainer}>
         <p>Filter by category</p>
         <select
-          style={{ margin: "8px 0px" }}
+          className={styles.selectCategory}
           name="select"
           onChange={(e) => handleSelect(e)}
         >
