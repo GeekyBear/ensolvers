@@ -2,6 +2,7 @@ import { Controller, Get, Param, Patch, Body, Delete, Post } from '@nestjs/commo
 import { NotesService } from './notes.service';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { CreateNoteDto } from './dto/create-note.dto';
+import { Note } from './entities/note.entity';
 
 @Controller('notes')
 export class NotesController {
@@ -15,6 +16,16 @@ export class NotesController {
   @Get()
   findAll() {
     return this.notesService.findAll();
+  }
+
+  @Get('non-archived')
+  async getNonArchivedNotes(): Promise<Note[]> {
+    return this.notesService.getNonArchivedNotes();
+  }
+
+  @Get('archived')
+  async getArchivedNotes(): Promise<Note[]> {
+    return this.notesService.getArchivedNotes();
   }
 
   @Get(':id')

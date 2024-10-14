@@ -21,6 +21,14 @@ export class NotesService {
     return this.notesRepository.find();
   }
 
+  async getNonArchivedNotes(): Promise<Note[]> {
+    return this.notesRepository.find({ where: { isArchived: false } });
+  }
+
+  async getArchivedNotes(): Promise<Note[]> {
+    return this.notesRepository.find({ where: { isArchived: true } });
+  }
+
   async findOne(id: string): Promise<Note> {
     return this.notesRepository.findOne({ where: { id } });
   }
