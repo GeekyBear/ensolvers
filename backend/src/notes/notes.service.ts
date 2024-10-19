@@ -59,7 +59,7 @@ export class NotesService {
       note.isArchived = true;
       await this.notesRepository.update(id, note);
       return note;
-    } catch (error) {      
+    } catch (error) {
       throw new Error(`Failed to archive note: ${error.message}`);
     }
   }

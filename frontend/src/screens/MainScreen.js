@@ -11,6 +11,7 @@ import {
   createNote,
   deleteNote,
   archiveNote,
+  updateNote,
 } from "../utils/noteService";
 import Note from "../components/Note";
 import NoteForm from "../components/NoteForm";
@@ -26,6 +27,12 @@ const MainScreen = () => {
   const handleCreateNote = (note) => {
     createNote(note).then((newNote) => {
       setNotes([...notes, newNote]);
+    });
+  };
+
+  const handleUpdateNote = (note) => {
+    updateNote(note).then((newNote) => {
+      setNotes(notes.map((note) => (note.id === newNote.id ? newNote : note)));
     });
   };
 
@@ -64,6 +71,7 @@ const MainScreen = () => {
                 note={note}
                 onDelete={handleDeleteNote}
                 onArchive={handleArchiveNote}
+                onUpdate={handleUpdateNote}
               />
             </Grid>
           ))}

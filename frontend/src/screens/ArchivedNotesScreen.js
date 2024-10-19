@@ -4,6 +4,7 @@ import {
   fetchArchivedNotes,
   unarchiveNote,
   deleteNote,
+  updateNote,
 } from "../utils/noteService";
 import Note from "../components/Note";
 
@@ -13,6 +14,12 @@ const ArchivedNotesScreen = () => {
   useEffect(() => {
     fetchArchivedNotes().then(setNotes);
   }, []);
+
+  const handleUpdateNote = (note) => {
+    updateNote(note).then((newNote) => {
+      setNotes(notes.map((note) => (note.id === newNote.id ? newNote : note)));
+    });
+  };
 
   const handleUnarchiveNote = (noteId) => {
     unarchiveNote(noteId).then(() => {
@@ -42,6 +49,7 @@ const ArchivedNotesScreen = () => {
                 note={note}
                 onDelete={handleDeleteNote}
                 onUnarchive={handleUnarchiveNote}
+                onUpdate={handleUpdateNote}
               />
             </Grid>
           ))}
