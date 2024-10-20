@@ -5,6 +5,8 @@ import { NotesModule } from './notes/notes.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Note } from './notes/entities/note.entity';
 import { ConfigModule } from '@nestjs/config';
+import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/entities/category.entity';
 
 @Module({
   imports: [
@@ -18,10 +20,12 @@ import { ConfigModule } from '@nestjs/config';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [Note],
+      entities: [Note, Category],
       synchronize: true,
+      dropSchema: true,
     }),
     NotesModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

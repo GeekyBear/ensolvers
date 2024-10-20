@@ -4,21 +4,42 @@ import { Repository } from 'typeorm';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { Note } from './entities/note.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class NotesService {
   constructor(
     @InjectRepository(Note)
     private notesRepository: Repository<Note>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
   ) {}
 
   async create(createNoteDto: CreateNoteDto): Promise<Note> {
-    const note = this.notesRepository.create(createNoteDto);
+    const { categories, ...noteData } = createNoteDto;
+    const note = this.notesRepository.create(noteData);
+
+    if (categories && categories.length > 0) {
+      note.categories = await Promise.all(
+        categories.map(async (categoryName) => {
+          let category = await this.categoryRepository.findOne({
+            where: { name: categoryName },
+          });
+          if (!category) {
+            category = this.categoryRepository.create({ name: categoryName });
+            await this.categoryRepository.save(category);
+          }
+          return category;
+        }),
+      );
+    }
+
     return this.notesRepository.save(note);
   }
-
   async findAll(): Promise<Note[]> {
-    return this.notesRepository.find();
+    return this.notesRepository.find({
+      relations: ['categories'],
+    });
   }
 
   async getNonArchivedNotes(): Promise<Note[]> {
@@ -34,8 +55,26 @@ export class NotesService {
   }
 
   async update(id: string, updateNoteDto: UpdateNoteDto): Promise<Note> {
-    await this.notesRepository.update(id, updateNoteDto);
-    return this.notesRepository.findOne({ where: { id } });
+    const { categories, ...noteData } = updateNoteDto;
+    await this.notesRepository.update(id, noteData);
+    const note = await this.notesRepository.findOne({ where: { id } });
+
+    if (categories && categories.length > 0) {
+      note.categories = await Promise.all(
+        categories.map(async (categoryName) => {
+          let category = await this.categoryRepository.findOne({
+            where: { name: categoryName },
+          });
+          if (!category) {
+            category = this.categoryRepository.create({ name: categoryName });
+            await this.categoryRepository.save(category);
+          }
+          return category;
+        }),
+      );
+    }
+
+    return this.notesRepository.save(note);
   }
 
   async remove(id: string): Promise<void> {

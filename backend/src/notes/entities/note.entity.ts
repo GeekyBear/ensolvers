@@ -1,12 +1,11 @@
+import { Category } from 'src/categories/entities/category.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  BeforeInsert,
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class Note {
@@ -22,8 +21,7 @@ export class Note {
   @Column({ default: false })
   isArchived: boolean;
 
-  @BeforeInsert()
-  generateId() {
-    this.id = uuidv4();
-  }
+  @ManyToMany(() => Category, (category) => category.notes, { cascade: true })
+  @JoinTable()
+  categories: Category[];
 }
