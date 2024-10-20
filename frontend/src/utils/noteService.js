@@ -111,15 +111,3 @@ export const unarchiveNote = async (noteId) => {
     throw error;
   }
 };
-
-export const searchCategories = async (query) => {
-  const response = await fetch(
-    `${API_BASE_URL}/categories/search?query=${query}`
-  );
-  return response.json();
-};
-
-export const getCategories = async () => {
-  const response = await fetch(`${API_BASE_URL}/categories`);
-  return response.json();
-};
