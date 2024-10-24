@@ -38,7 +38,7 @@ export const updateNote = async (note) => {
   const { id, title, content } = note;
   try {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
-      method: "PATCH",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
