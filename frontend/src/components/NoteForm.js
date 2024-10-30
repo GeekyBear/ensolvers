@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
   DialogActions,
+  DialogContent,
+  DialogTitle,
   Button,
+  TextField,
 } from "@mui/material";
 
-const NoteForm = ({ open, onClose, onSave }) => {
+const NoteForm = ({ open, onClose, note, onSave }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (note) {
+      setTitle(note.title);
+      setContent(note.content);
+    } else {
+      setTitle("");
+      setContent("");
+    }
+  }, [note]);
 
   const handleSave = () => {
     onSave({ title, content });
@@ -19,10 +29,9 @@ const NoteForm = ({ open, onClose, onSave }) => {
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Create Note</DialogTitle>
+      <DialogTitle>{note ? "Edit Note" : "Create Note"}</DialogTitle>
       <DialogContent>
         <TextField
-          autoFocus
           margin="dense"
           label="Title"
           type="text"

@@ -11,15 +11,13 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
-  TextField,
 } from "@mui/material";
 import { Edit, Delete, Archive, Unarchive } from "@mui/icons-material";
+import NoteEditDialog from "./NoteEditDialog";
 
 const Note = ({ note, onDelete, onArchive, onUnarchive, onUpdate }) => {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [noteTitle, setNoteTitle] = useState(note.title);
-  const [noteContent, setNoteContent] = useState(note.content);
 
   const handleEditOpen = () => {
     setEditOpen(true);
@@ -27,17 +25,6 @@ const Note = ({ note, onDelete, onArchive, onUnarchive, onUpdate }) => {
 
   const handleEditClose = () => {
     setEditOpen(false);
-  };
-
-  const handleEditSave = async () => {
-    try {
-      const updatedNote = { ...note, content: noteContent, title: noteTitle };
-      onUpdate(updatedNote);
-      setEditOpen(false);
-      // Refresh the note content in the UI
-    } catch (error) {
-      console.error("Error updating note:", error);
-    }
   };
 
   const handleClickOpen = () => {
@@ -84,52 +71,25 @@ const Note = ({ note, onDelete, onArchive, onUnarchive, onUpdate }) => {
           </IconButton>
         )}
       </CardActions>
-      <Dialog open={editOpen} onClose={handleEditClose}>
-        <DialogTitle>Edit Note</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Note Title"
-            type="text"
-            fullWidth
-            value={noteTitle}
-            onChange={(e) => setNoteTitle(e.target.value)}
-          />
-        </DialogContent>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Note Content"
-            type="text"
-            fullWidth
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleEditClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleEditSave} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <NoteEditDialog
+        open={editOpen}
+        onClose={handleEditClose}
+        note={note}
+        onSave={onUpdate}
+      />
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{"Confirm Delete"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the note?
+            Are you sure you want to delete this note?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
-            No
+            Cancel
           </Button>
-          <Button onClick={handleDelete} color="primary" autoFocus>
-            Yes
+          <Button onClick={handleDelete} color="primary">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
