@@ -1,4 +1,5 @@
 const API_BASE_URL = "http://localhost:3000/notes";
+const API_CATEGORIES_URL = "http://localhost:3000/categories";
 
 const handleResponse = async (response) => {
   if (!response.ok) {
@@ -35,14 +36,14 @@ export const createNote = async (note) => {
 };
 
 export const updateNote = async (note) => {
-  const { id, title, content } = note;
+  const { id, title, content, categories } = note;
   try {
     const response = await fetch(`${API_BASE_URL}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title, content }),
+      body: JSON.stringify({ title, content, categories }),
     });
 
     if (!response.ok) {
@@ -108,6 +109,16 @@ export const unarchiveNote = async (noteId) => {
     return handleResponse(response);
   } catch (error) {
     console.error("Error unarchiving note:", error);
+    throw error;
+  }
+};
+
+export const fetchCategories = async () => {
+  try {
+    const response = await fetch(`${API_CATEGORIES_URL}`);
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error fetching archived notes:", error);
     throw error;
   }
 };

@@ -6,13 +6,24 @@ import {
   DialogTitle,
   Button,
   TextField,
+  Select,
+  Box,
+  Chip,
+  MenuItem,
 } from "@mui/material";
+import { fetchCategories } from "../utils/noteService";
 
 const NoteForm = ({ open, onClose, note, onSave }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState(
+    note ? note.categories : []
+  );
 
   useEffect(() => {
+    fetchCategories().then(setCategories);
+
     if (note) {
       setTitle(note.title);
       setContent(note.content);
@@ -23,8 +34,12 @@ const NoteForm = ({ open, onClose, note, onSave }) => {
   }, [note]);
 
   const handleSave = () => {
-    onSave({ title, content });
+    onSave({ title, content, categories: selectedCategories || [] });
     onClose();
+  };
+
+  const handleCategoryChange = (event) => {
+    setSelectedCategories(event.target.value);
   };
 
   return (
@@ -47,6 +62,30 @@ const NoteForm = ({ open, onClose, note, onSave }) => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
+        <Select
+          multiple
+          value={selectedCategories}
+          onChange={handleCategoryChange}
+          renderValue={(selected) => (
+            <Box display="flex" flexWrap="wrap">
+              {selected.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+            </Box>
+          )}
+          fullWidth
+        >
+          {categories.map((category) => (
+            <MenuItem key={category.id} value={category.name}>
+              {category.name}
+            </MenuItem>
+          ))}
+        </Select>
+        <Box mt={2}>
+          {selectedCategories.map((category) => (
+            <Chip key={category} label={category} />
+          ))}
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">

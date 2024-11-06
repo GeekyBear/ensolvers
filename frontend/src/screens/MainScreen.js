@@ -17,7 +17,7 @@ import Note from "../components/Note";
 import NoteForm from "../components/NoteForm";
 
 const MainScreen = () => {
-  const [notes, setNotes] = useState([]); // Initialize as an empty array
+  const [notes, setNotes] = useState([]);
   const [isNoteFormOpen, setIsNoteFormOpen] = useState(false);
 
   useEffect(() => {

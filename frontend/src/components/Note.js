@@ -11,6 +11,7 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
+  Chip,
 } from "@mui/material";
 import { Edit, Delete, Archive, Unarchive } from "@mui/icons-material";
 import NoteEditDialog from "./NoteEditDialog";
@@ -52,6 +53,17 @@ const Note = ({ note, onDelete, onArchive, onUnarchive, onUpdate }) => {
       <CardContent>
         <Typography variant="h5">{note.title}</Typography>
         <Typography variant="body2">{note.content}</Typography>
+        {note.categories && note.categories.length > 0 && (
+          <div>
+            {note.categories.map((category) => (
+              <Chip
+                key={category.id}
+                label={category.name}
+                style={{ margin: "2px" }}
+              />
+            ))}
+          </div>
+        )}
       </CardContent>
       <CardActions>
         <IconButton onClick={handleEditOpen}>

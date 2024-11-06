@@ -43,11 +43,17 @@ export class NotesService {
   }
 
   async getNonArchivedNotes(): Promise<Note[]> {
-    return this.notesRepository.find({ where: { isArchived: false } });
+    return this.notesRepository.find({
+      where: { isArchived: false },
+      relations: ['categories'],
+    });
   }
 
   async getArchivedNotes(): Promise<Note[]> {
-    return this.notesRepository.find({ where: { isArchived: true } });
+    return this.notesRepository.find({
+      where: { isArchived: true },
+      relations: ['categories'],
+    });
   }
 
   async findOne(id: string): Promise<Note> {
@@ -59,21 +65,24 @@ export class NotesService {
     await this.notesRepository.update(id, noteData);
     const note = await this.notesRepository.findOne({ where: { id } });
 
-    if (categories && categories.length > 0) {
-      note.categories = await Promise.all(
-        categories.map(async (categoryName) => {
-          let category = await this.categoryRepository.findOne({
-            where: { name: categoryName },
-          });
-          if (!category) {
-            category = this.categoryRepository.create({ name: categoryName });
-            await this.categoryRepository.save(category);
-          }
-          return category;
-        }),
-      );
+    if (categories) {
+      if (categories.length > 0) {
+        note.categories = await Promise.all(
+          categories.map(async (categoryName) => {
+            let category = await this.categoryRepository.findOne({
+              where: { name: categoryName },
+            });
+            if (!category) {
+              category = this.categoryRepository.create({ name: categoryName });
+              await this.categoryRepository.save(category);
+            }
+            return category;
+          }),
+        );
+      } else {
+        note.categories = [];
+      }
     }
-
     return this.notesRepository.save(note);
   }
 

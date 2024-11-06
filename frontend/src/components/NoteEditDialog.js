@@ -6,27 +6,60 @@ import {
   DialogTitle,
   Button,
   TextField,
+  Select,
+  Box,
+  Chip,
+  MenuItem,
 } from "@mui/material";
+import { fetchCategories } from "../utils/noteService";
 
 const NoteEditDialog = ({ open, onClose, note, onSave }) => {
   const [noteTitle, setNoteTitle] = useState(note.title);
   const [noteContent, setNoteContent] = useState(note.content);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState(
+    note ? note.categories?.map((category) => category.name) : []
+  );
 
   useEffect(() => {
+    try {
+      fetchCategories().then(setCategories);
+    } catch (error) {
+      console.log(error);
+    }
+
     if (note) {
       setNoteTitle(note.title);
       setNoteContent(note.content);
+      setSelectedCategories(
+        note.categories?.map((category) => category.name) || []
+      );
     }
   }, [note]);
 
   const handleSave = async () => {
+    console.log("note", note);
+    console.log("noteTitle", noteTitle);
+    console.log("noteContent", noteContent);
+    console.log("selectedCategories", selectedCategories);
+
+    const updatedNote = {
+      ...note,
+      content: noteContent,
+      title: noteTitle,
+      categories: selectedCategories || [],
+    };
     try {
-      const updatedNote = { ...note, content: noteContent, title: noteTitle };
       await onSave(updatedNote);
-      onClose();
     } catch (error) {
       console.error("Error updating note:", error);
     }
+    onClose();
+  };
+
+  const handleCategoryChange = (event) => {
+    console.log("event.target.value", event.target.value);
+    setSelectedCategories(event.target.value || []);
   };
 
   return (
@@ -50,6 +83,30 @@ const NoteEditDialog = ({ open, onClose, note, onSave }) => {
           value={noteContent}
           onChange={(e) => setNoteContent(e.target.value)}
         />
+        <Select
+          multiple
+          value={selectedCategories}
+          onChange={handleCategoryChange}
+          renderValue={(selected) => (
+            <Box display="flex" flexWrap="wrap">
+              {selected.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+            </Box>
+          )}
+          fullWidth
+        >
+          {(categories || []).map((category) => (
+            <MenuItem key={category.id} value={category.name}>
+              {category.name}
+            </MenuItem>
+          ))}
+        </Select>
+        <Box mt={2}>
+          {(selectedCategories || []).map((category, index) => (
+            <Chip key={index} label={category} style={{ margin: "2px" }} />
+          ))}
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">

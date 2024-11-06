@@ -13,5 +13,6 @@ export class CreateNoteDto {
   @IsOptional()
   isArchived: boolean;
 
+  @IsOptional()
   categories?: string[];
 }
