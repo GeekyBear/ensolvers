@@ -122,3 +122,19 @@ export const fetchCategories = async () => {
     throw error;
   }
 };
+
+export const createCategory = async (name) => {
+  const response = await fetch(`${API_CATEGORIES_URL}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create category");
+  }
+
+  return response.json();
+};

@@ -10,16 +10,19 @@ import {
   Box,
   Chip,
   MenuItem,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
-import { fetchCategories } from "../utils/noteService";
+import { fetchCategories, createCategory } from "../utils/noteService";
 
 const NoteForm = ({ open, onClose, note, onSave }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState(
-    note ? note.categories : []
+    note ? note.categories.map((category) => category.name) : []
   );
+  const [newCategory, setNewCategory] = useState("");
 
   useEffect(() => {
     fetchCategories().then(setCategories);
@@ -27,9 +30,13 @@ const NoteForm = ({ open, onClose, note, onSave }) => {
     if (note) {
       setTitle(note.title);
       setContent(note.content);
+      setSelectedCategories(
+        note.categories.map((category) => category.name) || []
+      );
     } else {
       setTitle("");
       setContent("");
+      setSelectedCategories([]);
     }
   }, [note]);
 
@@ -40,6 +47,19 @@ const NoteForm = ({ open, onClose, note, onSave }) => {
 
   const handleCategoryChange = (event) => {
     setSelectedCategories(event.target.value);
+  };
+
+  const handleAddCategory = async () => {
+    if (newCategory.trim() !== "") {
+      try {
+        const newCategoryObject = await createCategory(newCategory.trim());
+        setCategories([...categories, newCategoryObject]);
+        setSelectedCategories([...selectedCategories, newCategoryObject.name]);
+        setNewCategory("");
+      } catch (error) {
+        console.error("Error creating category:", error);
+      }
+    }
   };
 
   return (
@@ -62,37 +82,48 @@ const NoteForm = ({ open, onClose, note, onSave }) => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
-        <Select
-          multiple
-          value={selectedCategories}
-          onChange={handleCategoryChange}
-          renderValue={(selected) => (
-            <Box display="flex" flexWrap="wrap">
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
-          fullWidth
-        >
-          {categories.map((category) => (
-            <MenuItem key={category.id} value={category.name}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select>
-        <Box mt={2}>
-          {selectedCategories.map((category) => (
-            <Chip key={category} label={category} />
-          ))}
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Categories</InputLabel>
+          <Select
+            multiple
+            value={selectedCategories}
+            onChange={handleCategoryChange}
+            renderValue={(selected) => (
+              <Box display="flex" flexWrap="wrap">
+                {selected.map((value) => (
+                  <Chip key={value} label={value} />
+                ))}
+              </Box>
+            )}
+          >
+            {categories.map((category) => (
+              <MenuItem key={category.id} value={category.name}>
+                {category.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Box display="flex" alignItems="center" mt={2}>
+          <TextField
+            label="New Category"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            fullWidth
+          />
+          <Button
+            onClick={handleAddCategory}
+            variant="contained"
+            color="primary"
+            style={{ marginLeft: "8px" }}
+          >
+            Add
+          </Button>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleSave} color="primary">
-          Save
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={handleSave}>
+          {note ? "Save Changes" : "Create Note"}
         </Button>
       </DialogActions>
     </Dialog>

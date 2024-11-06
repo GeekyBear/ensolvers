@@ -66,23 +66,20 @@ export class NotesService {
     const note = await this.notesRepository.findOne({ where: { id } });
 
     if (categories) {
-      if (categories.length > 0) {
-        note.categories = await Promise.all(
-          categories.map(async (categoryName) => {
-            let category = await this.categoryRepository.findOne({
-              where: { name: categoryName },
-            });
-            if (!category) {
-              category = this.categoryRepository.create({ name: categoryName });
-              await this.categoryRepository.save(category);
-            }
-            return category;
-          }),
-        );
-      } else {
-        note.categories = [];
-      }
+      note.categories = await Promise.all(
+        categories.map(async (categoryName) => {
+          let category = await this.categoryRepository.findOne({
+            where: { name: categoryName },
+          });
+          if (!category) {
+            category = this.categoryRepository.create({ name: categoryName });
+            await this.categoryRepository.save(category);
+          }
+          return category;
+        }),
+      );
     }
+
     return this.notesRepository.save(note);
   }
 
