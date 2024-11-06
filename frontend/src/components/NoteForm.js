@@ -42,6 +42,9 @@ const NoteForm = ({ open, onClose, note, onSave }) => {
 
   const handleSave = () => {
     onSave({ title, content, categories: selectedCategories || [] });
+    setTitle("");
+    setContent("");
+    setSelectedCategories([]);
     onClose();
   };
 
