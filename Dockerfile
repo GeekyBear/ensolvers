@@ -31,4 +31,4 @@ EXPOSE 3000
 EXPOSE 8080
 
 # Command to run the backend and frontend
-CMD ["sh", "-c", "cd /app/backend && node dist/main.js & cd /app/frontend && npx serve -s build -l 8080"]
+CMD ["sh", "-c", "cd /app/frontend && npx serve -s build -l 8080 & cd /app/backend && node dist/main.js"]
