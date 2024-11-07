@@ -5,6 +5,10 @@ import {
   Button,
   Link,
   Grid2 as Grid,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import {
   fetchNotes,
@@ -12,6 +16,7 @@ import {
   deleteNote,
   archiveNote,
   updateNote,
+  fetchCategories,
 } from "../utils/noteService";
 import Note from "../components/Note";
 import NoteForm from "../components/NoteForm";
@@ -19,9 +24,15 @@ import NoteForm from "../components/NoteForm";
 const MainScreen = () => {
   const [notes, setNotes] = useState([]);
   const [isNoteFormOpen, setIsNoteFormOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    fetchNotes().then(setNotes);
+    fetchNotes().then((fetchedNotes) => {
+      console.log("Fetched Notes:", fetchedNotes);
+      setNotes(fetchedNotes);
+    });
+    fetchCategories().then(setCategories);
   }, []);
 
   const handleCreateNote = (note) => {
@@ -48,6 +59,20 @@ const MainScreen = () => {
     });
   };
 
+  const handleCategoryChange = (event) => {
+    setSelectedCategory(event.target.value);
+    console.log("Selected Category:", event.target.value);
+  };
+
+  const filteredNotes = selectedCategory
+    ? notes.filter((note) => {
+        console.log("Note Categories:", note.categories);
+        return note.categories.some(
+          (category) => category.name === selectedCategory
+        );
+      })
+    : notes;
+
   return (
     <Container>
       <Typography variant="h4" gutterBottom>
@@ -60,12 +85,29 @@ const MainScreen = () => {
       >
         Create New Note
       </Button>
+      <FormControl variant="outlined" style={{ minWidth: 200, marginTop: 16 }}>
+        <InputLabel>Filter by Category</InputLabel>
+        <Select
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          label="Filter by Category"
+        >
+          <MenuItem value="">
+            <em>All</em>
+          </MenuItem>
+          {categories.map((category) => (
+            <MenuItem key={category.id} value={category.name}>
+              {category.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <Link href="/archived" variant="body2">
         View Archived Notes
       </Link>
       <Grid container spacing={3}>
-        {notes.length > 0 &&
-          notes.map((note) => (
+        {filteredNotes.length > 0 &&
+          filteredNotes.map((note) => (
             <Grid item xs={12} sm={6} md={4} lg={3} key={note.id}>
               <Note
                 note={note}
