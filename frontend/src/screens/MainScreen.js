@@ -9,6 +9,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Box,
 } from "@mui/material";
 import {
   fetchNotes,
@@ -38,9 +39,7 @@ const MainScreen = () => {
   const handleCreateNote = (note) => {
     createNote(note).then((newNote) => {
       setNotes([...notes, newNote]);
-      // Extract categories from the new note
       const newCategories = newNote.categories.map((category) => category.name);
-      // Add new categories to the categories state if they don't already exist
       setCategories((prevCategories) => {
         const existingCategoryNames = prevCategories.map(
           (category) => category.name
@@ -93,14 +92,27 @@ const MainScreen = () => {
       <Typography variant="h4" gutterBottom>
         My Notes
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => setIsNoteFormOpen(true)}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
       >
-        Create New Note
-      </Button>
-      <FormControl variant="outlined" style={{ minWidth: 200, marginTop: 16 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setIsNoteFormOpen(true)}
+        >
+          Create New Note
+        </Button>
+        <Link href="/archived" variant="body2">
+          View Archived Notes
+        </Link>
+      </Box>
+      <FormControl
+        variant="outlined"
+        style={{ minWidth: 200, marginBottom: 16 }}
+      >
         <InputLabel>Filter by Category</InputLabel>
         <Select
           value={selectedCategory}
@@ -117,9 +129,6 @@ const MainScreen = () => {
           ))}
         </Select>
       </FormControl>
-      <Link href="/archived" variant="body2">
-        View Archived Notes
-      </Link>
       <Grid container spacing={3}>
         {filteredNotes.length > 0 &&
           filteredNotes.map((note) => (
