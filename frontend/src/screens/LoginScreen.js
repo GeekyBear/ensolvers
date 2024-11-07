@@ -5,13 +5,13 @@ import { TextField, Button, Typography, Container } from "@mui/material";
 function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  console.log("Username:", process.env.REACT_APP_USER);
-  console.log("Password:", process.env.REACT_APP_PASSWORD);
 
   const handleLogin = () => {
     if (
-      username === process.env.REACT_APP_USER &&
-      password === process.env.REACT_APP_PASSWORD
+      // REMOVE SENSITIVE INFORMATION. THIS IS JUST FOR DEMO PURPOSES.
+      // DO NOT STORE PASSWORDS. USE DOTENV FOR SENSITIVE INFORMATION.
+      username === "admin" &&
+      password === "Potato4."
     ) {
       onLogin();
     } else {
