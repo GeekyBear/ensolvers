@@ -1,23 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Container, Typography, Grid2 as Grid, Link } from "@mui/material";
+import { Container, Typography, Button, Link, Grid, Box } from "@mui/material";
 import {
   fetchArchivedNotes,
-  unarchiveNote,
   deleteNote,
+  unarchiveNote,
   updateNote,
 } from "../utils/noteService";
 import Note from "../components/Note";
 
-const ArchivedNotesScreen = () => {
+const ArchivedNotesScreen = ({ handleLogout }) => {
   const [notes, setNotes] = useState([]);
 
   useEffect(() => {
-    fetchArchivedNotes().then(setNotes);
+    fetchArchivedNotes().then((fetchedNotes) => {
+      setNotes(fetchedNotes);
+    });
   }, []);
 
-  const handleUpdateNote = (note) => {
-    updateNote(note).then((newNote) => {
-      setNotes(notes.map((note) => (note.id === newNote.id ? newNote : note)));
+  const handleDeleteNote = (noteId) => {
+    deleteNote(noteId).then(() => {
+      setNotes(notes.filter((note) => note.id !== noteId));
     });
   };
 
@@ -27,18 +29,30 @@ const ArchivedNotesScreen = () => {
     });
   };
 
-  const handleDeleteNote = (noteId) => {
-    deleteNote(noteId).then(() => {
-      setNotes(notes.filter((note) => note.id !== noteId));
+  const handleUpdateNote = (note) => {
+    updateNote(note).then((updatedNote) => {
+      setNotes(
+        notes.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+      );
     });
   };
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>
-        Archived Notes
-      </Typography>
-      <Link href="/" variant="body2">
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <Typography variant="h4" gutterBottom>
+          Archived Notes
+        </Typography>
+        <Button variant="contained" color="secondary" onClick={handleLogout}>
+          Logout
+        </Button>
+      </Box>
+      <Link href="/" variant="body2" sx={{ mb: 2, display: "block" }}>
         Go back to My Notes
       </Link>
       <Grid container spacing={3}>

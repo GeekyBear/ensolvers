@@ -21,8 +21,9 @@ import {
 } from "../utils/noteService";
 import Note from "../components/Note";
 import NoteForm from "../components/NoteForm";
+import styles from "./MainScreen.module.css";
 
-const MainScreen = () => {
+const MainScreen = ({ handleLogout }) => {
   const [notes, setNotes] = useState([]);
   const [isNoteFormOpen, setIsNoteFormOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -98,16 +99,28 @@ const MainScreen = () => {
         alignItems="center"
         mb={2}
       >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setIsNoteFormOpen(true)}
-        >
-          Create New Note
-        </Button>
-        <Link href="/archived" variant="body2">
-          View Archived Notes
-        </Link>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setIsNoteFormOpen(true)}
+          >
+            Create New Note
+          </Button>
+          <Link href="/archived" variant="body2" sx={{ ml: 2 }}>
+            View Archived Notes
+          </Link>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            color="secondary"
+            className={styles.logoutButton}
+            onClick={handleLogout}
+          >
+            Logout
+          </Button>
+        </Grid>
       </Box>
       <FormControl
         variant="outlined"
