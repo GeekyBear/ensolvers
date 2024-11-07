@@ -8,10 +8,8 @@ function LoginScreen({ onLogin }) {
 
   const handleLogin = () => {
     if (
-      // REMOVE SENSITIVE INFORMATION. THIS IS JUST FOR DEMO PURPOSES.
-      // DO NOT STORE PASSWORDS. USE DOTENV FOR SENSITIVE INFORMATION.
-      username === "admin" &&
-      password === "Potato4."
+      username === process.env.REACT_APP_USER &&
+      password === process.env.REACT_APP_PASSWORD
     ) {
       onLogin();
     } else {
