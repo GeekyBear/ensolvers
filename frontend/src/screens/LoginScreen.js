@@ -5,6 +5,8 @@ import { TextField, Button, Typography, Container } from "@mui/material";
 function LoginScreen({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  console.log("Username:", process.env.REACT_APP_USER);
+  console.log("Password:", process.env.REACT_APP_PASSWORD);
 
   const handleLogin = () => {
     if (
