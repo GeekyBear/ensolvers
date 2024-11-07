@@ -38,6 +38,21 @@ const MainScreen = () => {
   const handleCreateNote = (note) => {
     createNote(note).then((newNote) => {
       setNotes([...notes, newNote]);
+      // Extract categories from the new note
+      const newCategories = newNote.categories.map((category) => category.name);
+      // Add new categories to the categories state if they don't already exist
+      setCategories((prevCategories) => {
+        const existingCategoryNames = prevCategories.map(
+          (category) => category.name
+        );
+        const updatedCategories = [...prevCategories];
+        newCategories.forEach((categoryName) => {
+          if (!existingCategoryNames.includes(categoryName)) {
+            updatedCategories.push({ id: newNote.id, name: categoryName });
+          }
+        });
+        return updatedCategories;
+      });
     });
   };
 
